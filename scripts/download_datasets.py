@@ -1,14 +1,43 @@
+import subprocess
 import tarfile
 import zipfile
-from os import makedirs, remove
-from os.path import dirname, isfile, isdir
+from os import listdir, makedirs, walk, remove
+from os.path import join, isdir, isfile, dirname
 from shutil import rmtree, move
 
 import requests
 from pyunpack import Archive
 
 DL = f"{dirname(dirname(__file__))}/dataset_dl"
+
+
+# this will convert all files to the correct format
+def convert_dir(SOURCE_DIR, DEST_DIR=None, overwrite=True):
+    DEST_DIR = DEST_DIR or SOURCE_DIR
+    if not isdir(DEST_DIR):
+        makedirs(DEST_DIR)
+
+    for wav in listdir(SOURCE_DIR):
+        if wav.split(".")[-1] not in exts:
+            continue
+        print("converting ", wav)
+        wav = join(SOURCE_DIR, wav)
+        if wav.endswith(".wav"):
+            converted = join(DEST_DIR, wav)
+        else:
+            converted = join(DEST_DIR, wav + ".wav")
+        if isfile(converted) and not overwrite:
+            print("converted file already exists, skipping")
+        else:
+            cmd = ["ffmpeg", "-i", wav, "-acodec", "pcm_s16le", "-ar",
+                   "16000", "-ac", "1", "-f", "wav", converted, "-y"]
+            subprocess.call(cmd)
+            if not wav.endswith(".wav"):
+                remove(wav)
+
+
 makedirs(DL, exist_ok=True)
+exts = ["mp3", "mp4", "wav"]
 
 
 def download_ww_community():
@@ -164,3 +193,9 @@ download_NAR()
 download_building_106_kitchen()
 download_pdsounds()
 download_speech_commands()
+
+for root, _, files in walk(DL):
+    if not files:
+        continue
+    print("converting", root)
+    convert_dir(root)
