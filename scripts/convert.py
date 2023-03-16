@@ -19,7 +19,9 @@ def convert_dir(SOURCE_DIR, DEST_DIR):
             if f.split(".")[-1] not in exts:
                 continue
             wav = join(root, f)
-            converted = join(root.replace(SOURCE_DIR, DEST_DIR), f)
+            base = root.replace(SOURCE_DIR, DEST_DIR)
+            makedirs(base, exist_ok=True)
+            converted = join(base, f)
             if not converted.endswith(".wav"):
                 converted += ".wav"
 
