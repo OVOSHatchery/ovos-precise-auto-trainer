@@ -10,6 +10,7 @@ jobs:
         with:
           ref: dev
           path: auto_train
+          lfs: 'true'
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
