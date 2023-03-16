@@ -12,44 +12,42 @@ exts = ["mp3", "mp4", "wav"]
 def convert_dir(SOURCE_DIR, DEST_DIR):
     makedirs(DEST_DIR, exist_ok=True)
 
-    for wav in listdir(SOURCE_DIR):
-        if wav.split(".")[-1] not in exts:
+    for root, _, files in walk(SOURCE_DIR):
+        if not files:
             continue
-        print("converting", wav)
-        wav = join(SOURCE_DIR, wav)
-        if wav.endswith(".wav"):
-            converted = join(DEST_DIR, wav)
-        else:
-            converted = join(DEST_DIR, wav + ".wav")
+        for f in files:
+            if f.split(".")[-1] not in exts:
+                continue
+            wav = join(root, f)
+            converted = join(root.replace(SOURCE_DIR, DEST_DIR), f)
+            if not converted.endswith(".wav"):
+                converted += ".wav"
 
-        if isfile(converted):
-            continue
+            if isfile(converted):
+                continue
+            print("converting", wav, converted)
 
-        cmd = ["ffmpeg", "-i", wav, "-acodec", "pcm_s16le", "-ar",
-               "16000", "-ac", "1", "-f", "wav", converted, "-y"]
-        subprocess.call(cmd)
-        if not wav.endswith(".wav"):
-            remove(wav)
+            cmd = ["ffmpeg", "-i", wav, "-acodec", "pcm_s16le", "-ar",
+                   "16000", "-ac", "1", "-f", "wav", converted, "-y"]
+            subprocess.call(cmd)
 
 
 def convert_all_datasets(delete_original=True):
     to_del = []
     for dataset in listdir(DL):
-        print(dataset)
+        dataset_path = f"{DL}/{dataset}"
         if dataset.endswith("__converted"):
             continue
-        for root, _, files in walk(dataset):
-            print(root, files)
-            if not files:
-                continue
-            print("converting", root)
-            dst = root.replace(dataset, dataset + "__converted")
-            convert_dir(root, dst)
-            to_del.append(root)
+        print(dataset)
+
+        print("converting", dataset_path)
+        dst = dataset_path + "__converted"
+        convert_dir(dataset_path, dst)
+        to_del.append(dataset_path)
 
     if delete_original:
         for root in to_del:
-            rmtree(root)
+            rmtree(root, ignore_errors=True)
 
 
 convert_all_datasets()
