@@ -1,45 +1,18 @@
-import subprocess
 import tarfile
 import zipfile
-from os import listdir, makedirs, walk, remove
-from os.path import join, isdir, isfile, dirname
+from os import listdir, makedirs, remove
+from os.path import isdir, isfile, dirname
 from shutil import rmtree, move
 
 import requests
 from pyunpack import Archive
 
 DL = f"{dirname(dirname(__file__))}/dataset_dl"
-
-
-# this will convert all files to the correct format
-def convert_dir(SOURCE_DIR, DEST_DIR=None, overwrite=True):
-    DEST_DIR = DEST_DIR or SOURCE_DIR
-    if not isdir(DEST_DIR):
-        makedirs(DEST_DIR)
-
-    for wav in listdir(SOURCE_DIR):
-        if wav.split(".")[-1] not in exts:
-            continue
-        print("converting ", wav)
-        wav = join(SOURCE_DIR, wav)
-        if wav.endswith(".wav"):
-            converted = join(DEST_DIR, wav)
-        else:
-            converted = join(DEST_DIR, wav + ".wav")
-        if isfile(converted) and not overwrite:
-            print("converted file already exists, skipping")
-        else:
-            cmd = ["ffmpeg", "-i", wav, "-acodec", "pcm_s16le", "-ar",
-                   "16000", "-ac", "1", "-f", "wav", converted, "-y"]
-            subprocess.call(cmd)
-            if not wav.endswith(".wav"):
-                remove(wav)
-
-
 makedirs(DL, exist_ok=True)
 exts = ["mp3", "mp4", "wav"]
 
 
+# download datasets of interest
 def download_ww_community():
     FOLDER = f"{DL}/ovos-ww-community-dataset-master"
     ZIP_PATH = f"{DL}/ovos-ww-community-dataset.zip"
@@ -161,6 +134,9 @@ def download_building_106_kitchen():
         rmtree(f"{DL}/__MACOSX")
         rmtree(f"{FOLDER}/test_sequence")
         remove(f"{FOLDER}/README.txt")
+        for f in listdir(f"{FOLDER}/training_segments"):
+            move(f"{FOLDER}/training_segments/{f}", f"{FOLDER}/{f}")
+        rmtree(f"{FOLDER}/training_segments")
     assert isdir(FOLDER)
 
 
@@ -187,15 +163,13 @@ def download_speech_commands():
     assert isdir(FOLDER)
 
 
-download_ww_community()
-download_ww_synth()
-download_NAR()
-download_building_106_kitchen()
-download_pdsounds()
-download_speech_commands()
+def download_all_datasets():
+    download_ww_community()
+    download_ww_synth()
+    download_NAR()
+    download_building_106_kitchen()
+    download_pdsounds()
+    download_speech_commands()
 
-for root, _, files in walk(DL):
-    if not files:
-        continue
-    print("converting", root)
-    convert_dir(root)
+
+download_all_datasets()
