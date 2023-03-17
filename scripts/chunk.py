@@ -35,7 +35,7 @@ def split_into_chunks(SOURCE_DIR, DEST_DIR, seconds=3):
 def chunk_building_106_kitchen(delete_original=True):
     src = f"{DL}/building_106_kitchen/background"
     dst = f"{DL}/building_106_kitchen/background_crops"
-    if isdir(dst):
+    if isdir(dst) or not isdir(src):
         return
     for root, dirs, files in walk(src, topdown=False):
         path = root
@@ -48,7 +48,7 @@ def chunk_building_106_kitchen(delete_original=True):
 def chunk_pdsounds(delete_original=True):
     src = f"{DL}/pdsounds_march2009"
     dst = f"{DL}/pdsounds_march2009_crops"
-    if isdir(dst):
+    if isdir(dst) or not isdir(src):
         return
     for root, dirs, files in walk(src, topdown=False):
         path = root
@@ -61,7 +61,7 @@ def chunk_pdsounds(delete_original=True):
 def chunk_speech_commands(delete_original=True):
     src = f"{DL}/speech_commands_v001/_background_noise_"
     dst = f"{DL}/speech_commands_v001/background_noise"
-    if isdir(dst):
+    if isdir(dst) or not isdir(src):
         return
     for root, dirs, files in walk(src, topdown=False):
         path = root
