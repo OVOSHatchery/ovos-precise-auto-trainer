@@ -1,16 +1,15 @@
-name: Test Dataset Download
+name: NAR Dataset Download
 on:
   workflow_dispatch:
 
 jobs:
-  test_datasets:
+  dl_nar_dataset:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           ref: dev
           path: auto_train
-          lfs: 'true'
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
@@ -23,17 +22,14 @@ jobs:
           python -m pip install -r auto_train/requirements.txt
       - name: Download Datasets
         run: |
-          python auto_train/scripts/download_datasets.py
-      - name: Chunk Datasets
-        run: |
-          python auto_train/scripts/chunk.py
+          python auto_train/scripts/download_NAR.py
       - name: Convert Datasets
         run: |
           python auto_train/scripts/convert.py
       - name: Commit samples
         uses: EndBug/add-and-commit@v9
         with:
-          message: New wav samples
+          message: NAR dataset samples
           add: 'dataset_dl/*.wav --force'
           cwd: 'auto_train'
-          new_branch: downloaded_datasets
+          new_branch: NAR_dataset
