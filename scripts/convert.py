@@ -1,6 +1,6 @@
 import subprocess
-from os import listdir, makedirs, walk, remove
-from os.path import join, isdir, isfile, dirname
+from os import listdir, makedirs, walk
+from os.path import join, isfile, dirname
 from shutil import rmtree
 
 DL = f"{dirname(dirname(__file__))}/dataset_dl"

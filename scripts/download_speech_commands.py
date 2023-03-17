@@ -1,5 +1,5 @@
-import zipfile
-from os import makedirs, remove
+import tarfile
+from os import makedirs
 from os.path import isdir, dirname
 from shutil import rmtree
 
@@ -10,15 +10,15 @@ makedirs(DL, exist_ok=True)
 exts = ["mp3", "mp4", "wav"]
 
 
-def download_NAR():
-    FOLDER = f"{DL}/NAR_dataset"
-    ZIP_PATH = f"{DL}/NAR_dataset.zip"
-    ZIP_URL = "http://perception.inrialpes.fr/Free_Access_Data/Data/NAR_Dataset/NAR_dataset.zip"
+def download_speech_commands():
+    FOLDER = f"{DL}/speech_commands_v001"
+    ZIP_PATH = f"{DL}/speech_commands_v0.01.tar.gz"
+    ZIP_URL = "http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz"
 
     if isdir(FOLDER):
         rmtree(FOLDER)
 
-    print("downloading NAR_dataset.zip")
+    print("downloading speech_commands_v0.01.tar.gz")
     r = requests.get(ZIP_URL)
     if r.status_code != 200:
         raise RuntimeError("download failed")
@@ -26,11 +26,11 @@ def download_NAR():
         f.write(r.content)
 
     # extract .zip file
-    with zipfile.ZipFile(ZIP_PATH, 'r') as zip_ref:
-        zip_ref.extractall(FOLDER)
-    remove(ZIP_PATH)
+    with tarfile.open(ZIP_PATH) as f:
+        # extracting file
+        f.extractall(FOLDER)
 
     assert isdir(FOLDER)
 
 
-download_NAR()
+download_speech_commands()

@@ -1,6 +1,6 @@
 import zipfile
-from os import makedirs, remove
-from os.path import isdir, isfile, dirname
+from os import makedirs
+from os.path import isdir, dirname
 from shutil import rmtree
 
 import requests
