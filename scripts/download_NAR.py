@@ -28,7 +28,6 @@ def download_NAR():
     # extract .zip file
     with zipfile.ZipFile(ZIP_PATH, 'r') as zip_ref:
         zip_ref.extractall(FOLDER)
-    remove(ZIP_PATH)
 
     assert isdir(FOLDER)
 
